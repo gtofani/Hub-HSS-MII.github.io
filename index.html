@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSS2 Engineer Hub - PT.MII</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .sidebar {
+            background-color: white;
+            min-height: calc(100vh - 56px);
+            box-shadow: 2px 0 5px rgba(0,0,0,.1);
+        }
+
+        .sidebar .nav-link {
+            color: var(--primary-color);
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background-color: #f8f9fa;
+        }
+
+        .activity-item {
+            font-size: 0.8em;
+            padding: 2px;
+            margin: 1px 0;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .engineer-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .engineer-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,.2);
+        }
+
+        .file-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .ebook-item {
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ebook-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .admin-badge {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .status-badge {
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .status-active {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-inactive {
+            background-color: #95a5a6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-hdd-network"></i> HSS2 Engineer Hub
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text" id="userDisplay">
+                    <i class="bi bi-person-circle"></i> <span id="currentUser">Guest</span>
+                </span>
+                <button class="btn btn-outline-light ms-3" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login/Register Section -->
+    <div id="loginSection" class="container">
+        <div class="login-container">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Login / Register</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-3" id="authTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#register">Register</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="login">
+                            <form onsubmit="handleLogin(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="loginUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="loginPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Login</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="register">
+                            <form onsubmit="handleRegister(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="regUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="regPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="regFullName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="regEmail" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Register</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="container-fluid" style="display: none;">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar">
+                <div class="p-3">
+                    <h5 class="mb-3">Navigation</h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('activities')">
+                            <i class="bi bi-calendar3"></i> Activities
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('ebooks')">
+                            <i class="bi bi-book"></i> Ebooks
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('documents')">
+                            <i class="bi bi-folder"></i> Documents
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('engineers')" id="engineersLink" style="display: none;">
+                            <i class="bi bi-people"></i> Manage Engineers
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 p-4">
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="content-section">
+                    <h2 class="mb-4">Dashboard</h2>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Engineers</h5>
+                                    <h2 id="totalEngineers">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Ebooks</h5>
+                                    <h2 id="totalEbooks">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Activities</h5>
+                                    <h2 id="totalActivities">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-info">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Documents</h5>
+                                    <h2 id="totalDocuments">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="mb-3">Engineers Overview</h3>
+                    <div class="row" id="engineersOverview">
+                        <!-- Engineer cards will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Activities Section -->
+                <div id="activitiesSection" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Activities Calendar</h2>
+                        <button class="btn btn-primary" onclick="showAddActivityModal()">
+                            <i class="bi bi-plus-circle"></i> Add Activity
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <button class="btn btn-outline-primary" onclick="previousMonth()">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <h4 id="currentMonth"></h4>
+                                <button class="btn btn-outline-primary" onclick="nextMonth()">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="calendar-grid" id="calendar">
+                                <!-- Calendar will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ebooks Section -->
+                <div id="ebooksSection" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Ebooks & Knowledge Base</h2>
+                        <button class="btn btn-primary" onclick="showAddEbookModal()">
+                            <i class="bi bi-plus-circle"></i> Create Ebook
+                        </button>
+                    </div>
+                    <div id="ebooksList">
+                        <!-- Ebooks will be listed here -->
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div id="documentsSection" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Documents</h2>
+                        <button class="btn btn-primary" onclick="document.getElementById('fileUpload').click()">
+                            <i class="bi bi-upload"></i> Upload Document
+                        </button>
+                        <input type="file" id="fileUpload" style="display: none;" multiple onchange="handleFileUpload(event)">
+                    </div>
+                    <div id="documentsList">
+                        <!-- Documents will be listed here -->
+                    </div>
+                </div>
+
+                <!-- Engineers Management Section (Admin Only) -->
+                <div id="engineersSection" class="content-section" style="display: none;">
+                    <h2 class="mb-4">Manage Engineers</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Username</th>
+                                            <th>Full Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="engineersTable">
+                                        <!-- Engineers will be listed here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Activity Modal -->
+    <div class="modal fade" id="addActivityModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Activity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form onsubmit="saveActivity(event)">
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" id="activityDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Activity</label>
+                            <textarea class="form-control" id="activityText" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Activity</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Ebook Modal -->
+    <div class="modal fade" id="addEbookModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Ebook</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form onsubmit="saveEbook(event)">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" id="ebookTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Content</label>
+                            <textarea class="form-control" id="ebookContent" rows="10" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Ebook</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Ebook Modal -->
+    <div class="modal fade" id="viewEbookModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewEbookTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="viewEbookContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize data structures
+        let currentUser = null;
+        let currentDate = new Date();
+        let engineers = JSON.parse(localStorage.getItem('engineers')) || [];
+        let activities = JSON.parse(localStorage.getItem('activities')) || [];
+        let ebooks = JSON.parse(localStorage.getItem('ebooks')) || [];
+        let documents = JSON.parse(localStorage.getItem('documents')) || {};
+
+        // Initialize with admin user if not exists
+        if (engineers.length === 0) {
+            engineers.push({
+                username: 'admin',
+                password: 'admin123',
+                fullName: 'System Administrator',
+                email: 'admin@ptmii.com',
+                role: 'admin',
+                status: 'active'
+            });
+            localStorage.setItem('engineers', JSON.stringify(engineers));
+        }
+
+        // Authentication functions
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const engineer = engineers.find(e => e.username === username && e.password === password);
+            
+            if (engineer) {
+                currentUser = engineer;
+                document.getElementById('currentUser').textContent = engineer.fullName;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                
+                if (engineer.role === 'admin') {
+                    document.getElementById('engineersLink').style.display = 'block';
+                }
+                
+                showToast('Login successful!', 'success');
+                loadDashboard();
+            } else {
+                showToast('Invalid username or password', 'danger');
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const fullName = document.getElementById('regFullName').value;
+            const email = document.getElementById('regEmail').value;
+            
+            if (engineers.find(e => e.username === username)) {
+                showToast('Username already exists', 'danger');
+                return;
+            }
+            
+            const newEngineer = {
+                username,
+                password,
+                fullName,
+                email,
+                role: 'engineer',
+                status: 'active'
+            };
+            
+            engineers.push(newEngineer);
+            localStorage.setItem('engineers', JSON.stringify(engineers));
+            
+            // Create folder structure (simulated)
+            if (!documents[username]) {
+                documents[username] = {
+                    ebooks: [],
+                    files: []
+                };
+                localStorage.setItem('documents', JSON.stringify(documents));
+            }
+            
+            showToast('Registration successful! Please login.', 'success');
+            document.querySelector('#authTabs a[href="#login"]').click();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('currentUser').textContent = 'Guest';
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('engineersLink').style.display = 'none';
+        }
+
+        // Navigation functions
+        function showSection(section) {
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.getElementById(section + 'Section').style.display = 'block';
+            
+            document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+            event.target.closest('.nav-link').classList.add('active');
+            
+            switch(section) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'activities':
+                    loadCalendar();
+                    break;
+                case 'ebooks':
+                    loadEbooks();
+                    break;
+                case 'documents':
+                    loadDocuments();
+                    break;
+                case 'engineers':
+                    loadEngineersTable();
+                    break;
+            }
+        }
+
+        // Dashboard functions
+        function loadDashboard() {
+            // Update statistics
+            document.getElementById('totalEngineers').textContent = engineers.length;
+            document.getElementById('totalEbooks').textContent = ebooks.length;
+            document.getElementById('totalActivities').textContent = activities.length;
+            
+            let totalDocs = 0;
+            Object.values(documents).forEach(userDocs => {
+                totalDocs += userDocs.files ? userDocs.files.length : 0;
+            });
+            document.getElementById('totalDocuments').textContent = totalDocs;
+            
+            // Load engineers overview
+            const overview = document.getElementById('engineersOverview');
+            overview.innerHTML = '';
+            
+            engineers.forEach(engineer => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+                card.innerHTML = `
+                    <div class="card engineer-card" onclick="viewEngineerDetails('${engineer.username}')">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                ${engineer.fullName}
+                                ${engineer.role === 'admin' ? '<span class="admin-badge ms-2">Admin</span>' : ''}
+                            </h5>
+                            <p class="card-text">
+                                <i class="bi bi-person"></i> ${engineer.username}<br>
+                                <i class="bi bi-envelope"></i> ${engineer.email}<br>
+                                <span class="status-badge ${engineer.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                    ${engineer.status}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                `;
+                overview.appendChild(card);
+            });
+        }
+
+        // Calendar functions
+        function loadCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('currentMonth').textContent = 
+                new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'col text-center fw-bold';
+                header.textContent = day;
+                calendar.appendChild(header);
+            });
+            
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                calendar.appendChild(document.createElement('div'));
+            }
+            
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'col calendar-day';
+                dayCell.innerHTML = `<div class="fw-bold">${day}</div>`;
+                
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayActivities = activities.filter(a => a.date === dateStr && a.username === currentUser.username);
+                
+                dayActivities.forEach(activity => {
+                    const activityDiv = document.createElement('div');
+                    activityDiv.className = 'activity-item';
+                    activityDiv.textContent = activity.text.substring(0, 20) + '...';
+                    activityDiv.onclick = () => editActivity(activity);
+                    dayCell.appendChild(activityDiv);
+                });
+                
+                dayCell.onclick = (e) => {
+                    if (e.target === dayCell || e.target.classList.contains('fw-bold')) {
+                        document.getElementById('activityDate').value = dateStr;
+                        new bootstrap.Modal(document.getElementById('addActivityModal')).show();
+                    }
+                };
+                
+                calendar.appendChild(dayCell);
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            loadCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            loadCalendar();
+        }
+
+        function showAddActivityModal() {
+            document.getElementById('activityDate').value = new Date().toISOString().split('T')[0];
+            new bootstrap.Modal(document.getElementById('addActivityModal')).show();
+        }
+
+        function saveActivity(event) {
+            event.preventDefault();
+            const date = document.getElementById('activityDate').value;
+            const text = document.getElementById('activityText').value;
+            
+            const activity = {
+                id: Date.now(),
+                username: currentUser.username,
+                date,
+                text
+            };
+            
+            activities.push(activity);
+            localStorage.setItem('activities', JSON.stringify(activities));
+            
+            bootstrap.Modal.getInstance(document.getElementById('addActivityModal')).hide();
+            showToast('Activity saved successfully!', 'success');
+            loadCalendar();
+        }
+
+        function editActivity(activity) {
+            document.getElementById('activityDate').value = activity.date;
+            document.getElementById('activityText').value = activity.text;
+            
+            const modal = new bootstrap.Modal(document.getElementById('addActivityModal'));
+            modal.show();
+            
+            // Remove old activity
+            activities = activities.filter(a => a.id !== activity.id);
+            localStorage.setItem('activities', JSON.stringify(activities));
+        }
+
+        // Ebooks functions
+        function loadEbooks() {
+            const ebooksList = document.getElementById('ebooksList');
+            ebooksList.innerHTML = '';
+            
+            const userEbooks = ebooks.filter(e => e.username === currentUser.username);
+            
+            if (userEbooks.length === 0) {
+                ebooksList.innerHTML = '<p class="text-muted">No ebooks created yet.</p>';
+                return;
+            }
+            
+            userEbooks.forEach(ebook => {
+                const ebookDiv = document.createElement('div');
+                ebookDiv.className = 'ebook-item';
+                ebookDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5>${ebook.title}</h5>
+                            <small class="text-muted">Created: ${new Date(ebook.createdAt).toLocaleDateString()}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="viewEbook(${ebook.id})">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEbook(${ebook.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                ebooksList.appendChild(ebookDiv);
+            });
+        }
+
+        function showAddEbookModal() {
+            new bootstrap.Modal(document.getElementById('addEbookModal')).show();
+        }
+
+        function saveEbook(event) {
+            event.preventDefault();
+            const title = document.getElementById('ebookTitle').value;
+            const content = document.getElementById('ebookContent').value;
+            
+            const ebook = {
+                id: Date.now(),
+                username: currentUser.username,
+                title,
+                content,
+                createdAt: new Date().toISOString()
+            };
+            
+            ebooks.push(ebook);
+            localStorage.setItem('ebooks', JSON.stringify(ebooks));
+            
+            bootstrap.Modal.getInstance(document.getElementById('addEbookModal')).hide();
+            showToast('Ebook created successfully!', 'success');
+            loadEbooks();
+        }
+
+        function viewEbook(id) {
+            const ebook = ebooks.find(e => e.id === id);
+            if (ebook) {
+                document.getElementById('viewEbookTitle').textContent = ebook.title;
+                document.getElementById('viewEbookContent').innerHTML = 
+                    `<pre style="white-space: pre-wrap;">${ebook.content}</pre>`;
+                new bootstrap.Modal(document.getElementById('viewEbookModal')).show();
+            }
+        }
+
+        function deleteEbook(id) {
+            if (confirm('Are you sure you want to delete this ebook?')) {
+                ebooks = ebooks.filter(e => e.id !== id);
+                localStorage.setItem('ebooks', JSON.stringify(ebooks));
+                showToast('Ebook deleted successfully!', 'success');
+                loadEbooks();
+            }
+        }
+
+        // Documents functions
+        function loadDocuments() {
+            const documentsList = document.getElementById('documentsList');
+            documentsList.innerHTML = '';
+            
+            const userDocs = documents[currentUser.username];
+            if (!userDocs || !userDocs.files || userDocs.files.length === 0) {
+                documentsList.innerHTML = '<p class="text-muted">No documents uploaded yet.</p>';
+                return;
+            }
+            
+            userDocs.files.forEach(file => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'file-item';
+                fileDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark"></i> ${file.name}
+                            <small class="text-muted ms-2">${(file.size / 1024).toFixed(2)} KB</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument('${file.name}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+                documentsList.appendChild(fileDiv);
+            });
+        }
+
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            
+            if (!documents[currentUser.username]) {
+                documents[currentUser.username] = { files: [] };
+            }
+            
+            Array.from(files).forEach(file => {
+                const fileData = {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    uploadedAt: new Date().toISOString()
+                };
+                
+                documents[currentUser.username].files.push(fileData);
+            });
+            
+            localStorage.setItem('documents', JSON.stringify(documents));
+            showToast('Documents uploaded successfully!', 'success');
+            loadDocuments();
+        }
+
+        function deleteDocument(fileName) {
+            if (confirm('Are you sure you want to delete this document?')) {
+                documents[currentUser.username].files = 
+                    documents[currentUser.username].files.filter(f => f.name !== fileName);
+                localStorage.setItem('documents', JSON.stringify(documents));
+                showToast('Document deleted successfully!', 'success');
+                loadDocuments();
+            }
+        }
+
+        // Admin functions
+        function loadEngineersTable() {
+            const table = document.getElementById('engineersTable');
+            table.innerHTML = '';
+            
+            engineers.forEach(engineer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${engineer.username}</td>
+                    <td>${engineer.fullName}</td>
+                    <td>${engineer.email}</td>
+                    <td>
+                        <span class="badge ${engineer.role === 'admin' ? 'bg-danger' : 'bg-primary'}">
+                            ${engineer.role}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${engineer.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${engineer.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="toggleEngineerStatus('${engineer.username}')">
+                            <i class="bi bi-toggle-on"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEngineer('${engineer.username}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function toggleEngineerStatus(username) {
+            const engineer = engineers.find(e => e.username === username);
+            if (engineer) {
+                engineer.status = engineer.status === 'active' ? 'inactive' : 'active';
+                localStorage.setItem('engineers', JSON.stringify(engineers));
+                showToast(`Engineer ${engineer.status}!`, 'success');
+                loadEngineersTable();
+            }
+        }
+
+        function deleteEngineer(username) {
+            if (username === 'admin') {
+                showToast('Cannot delete admin user!', 'danger');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this engineer?')) {
+                engineers = engineers.filter(e => e.username !== username);
+                localStorage.setItem('engineers', JSON.stringify(engineers));
+                showToast('Engineer deleted successfully!', 'success');
+                loadEngineersTable();
+            }
+        }
+
+        function viewEngineerDetails(username) {
+            const engineer = engineers.find(e => e.username === username);
+            if (engineer) {
+                showToast(`Viewing ${engineer.fullName}'s details`, 'info');
+                // In a real application, this would navigate to a detailed view
+            }
+        }
+
+        // Utility functions
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in (in a real app, this would use cookies/sessions)
+            // For demo, we start with login screen
+        });
+    </script>
+</body>
+</html>
