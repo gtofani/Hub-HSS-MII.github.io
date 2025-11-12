@@ -66,6 +66,33 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
+        .user-table {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .user-table::-webkit-scrollbar {
+            width: 8px;
+        }
+        .user-table::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .user-table::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .user-table::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .file-count {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -263,37 +290,50 @@
                     </div>
                 </div>
 
-                <!-- User Info Section - For Non-Admin -->
-                <div class="bg-white rounded-xl shadow-md p-6" id="userInfoSection">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Informasi Pengguna</h2>
+                <!-- User Files Table - For Non-Admin -->
+                <div class="bg-white rounded-xl shadow-md p-6" id="userFilesSection" style="display: none;">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">File Saya</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-blue-50 rounded-lg p-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-user text-blue-600 text-2xl mr-3"></i>
-                                <div>
-                                    <p class="text-sm text-gray-600">Username</p>
-                                    <p class="font-semibold text-gray-800" id="dashboardUsername">-</p>
-                                </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-book text-blue-600 mr-2"></i>
+                                Ebook Saya
+                                <span class="file-count ml-2" id="myEbookCount">0</span>
+                            </h3>
+                            <div class="space-y-3 max-h-60 overflow-y-auto pr-2" id="myEbooksList">
+                                <!-- User's ebooks will be populated here -->
                             </div>
                         </div>
-                        <div class="bg-green-50 rounded-lg p-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-building text-green-600 text-2xl mr-3"></i>
-                                <div>
-                                    <p class="text-sm text-gray-600">Divisi SDS</p>
-                                    <p class="font-semibold text-gray-800" id="dashboardDivision">-</p>
-                                </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-folder-open text-green-600 mr-2"></i>
+                                Dokumentasi Project Saya
+                                <span class="file-count ml-2" id="myDocCount">0</span>
+                            </h3>
+                            <div class="space-y-3 max-h-60 overflow-y-auto pr-2" id="myDocsList">
+                                <!-- User's documentation will be populated here -->
                             </div>
                         </div>
                     </div>
-                    <div class="mt-6 bg-purple-50 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-info-circle text-purple-600 text-2xl mr-3"></i>
-                            <div>
-                                <p class="text-sm text-gray-600">Akses</p>
-                                <p class="font-semibold text-gray-800">Anda dapat membuat, melihat, dan mengunduh ebook serta dokumentasi project</p>
-                            </div>
-                        </div>
+                </div>
+
+                <!-- User Info Table - For Non-Admin -->
+                <div class="bg-white rounded-xl shadow-md p-6 mt-6" id="userInfoSection" style="display: none;">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Informasi Anggota</h2>
+                    <div class="user-table">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Nama Anggota</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Departemen</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Ebook</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Dokumentasi Project</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userInfoTableBody">
+                                <!-- User info will be populated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -616,12 +656,15 @@
             // Show/hide sections based on user role
             if (currentUser.role === 'admin') {
                 document.getElementById('recentActivitiesSection').style.display = 'block';
+                document.getElementById('userFilesSection').style.display = 'none';
                 document.getElementById('userInfoSection').style.display = 'none';
                 updateRecentActivities();
             } else {
                 document.getElementById('recentActivitiesSection').style.display = 'none';
+                document.getElementById('userFilesSection').style.display = 'block';
                 document.getElementById('userInfoSection').style.display = 'block';
-                updateUserInfo();
+                updateUserFiles();
+                updateUserInfoTable();
             }
         }
 
@@ -696,9 +739,222 @@
             });
         }
 
-        function updateUserInfo() {
-            document.getElementById('dashboardUsername').textContent = currentUser.username;
-            document.getElementById('dashboardDivision').textContent = currentUser.division || 'Administrator';
+        function updateUserFiles() {
+            // Update user's ebooks
+            const userEbooks = ebooks.filter(e => e.author === currentUser.username);
+            document.getElementById('myEbookCount').textContent = userEbooks.length;
+            
+            const ebooksContainer = document.getElementById('myEbooksList');
+            ebooksContainer.innerHTML = '';
+            
+            if (userEbooks.length === 0) {
+                ebooksContainer.innerHTML = '<p class="text-gray-500 text-sm italic">Belum ada ebook</p>';
+            } else {
+                userEbooks.forEach(ebook => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer';
+                    div.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-file-word text-blue-600 mr-3"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">${ebook.title}</p>
+                                <p class="text-xs text-gray-600">${formatDate(ebook.date).split(',')[0]}</p>
+                            </div>
+                        </div>
+                        <button onclick="downloadEbook(${ebook.id})" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    `;
+                    ebooksContainer.appendChild(div);
+                });
+            }
+            
+            // Update user's documentation
+            const userDocs = documentation.filter(d => d.uploader === currentUser.username);
+            document.getElementById('myDocCount').textContent = userDocs.length;
+            
+            const docsContainer = document.getElementById('myDocsList');
+            docsContainer.innerHTML = '';
+            
+            if (userDocs.length === 0) {
+                docsContainer.innerHTML = '<p class="text-gray-500 text-sm italic">Belum ada dokumentasi project</p>';
+            } else {
+                userDocs.forEach(doc => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer';
+                    
+                    let icon = 'fa-file';
+                    let iconColor = 'text-gray-600';
+                    if (doc.fileType.includes('pdf')) {
+                        icon = 'fa-file-pdf';
+                        iconColor = 'text-red-600';
+                    } else if (doc.fileType.includes('word')) {
+                        icon = 'fa-file-word';
+                        iconColor = 'text-blue-600';
+                    } else if (doc.fileType.includes('image')) {
+                        icon = 'fa-file-image';
+                        iconColor = 'text-green-600';
+                    }
+                    
+                    div.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas ${icon} ${iconColor} mr-3"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">${doc.title}</p>
+                                <p class="text-xs text-gray-600">${formatDate(doc.date).split(',')[0]}</p>
+                            </div>
+                        </div>
+                        <button onclick="downloadDoc(${doc.id})" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    `;
+                    docsContainer.appendChild(div);
+                });
+            }
+        }
+
+        function updateUserInfoTable() {
+            const tbody = document.getElementById('userInfoTableBody');
+            tbody.innerHTML = '';
+            
+            // Get all non-admin users
+            const nonAdminUsers = users.filter(u => u.role !== 'admin');
+            
+            nonAdminUsers.forEach(user => {
+                const userEbooks = ebooks.filter(e => e.author === user.username);
+                const userDocs = documentation.filter(d => d.uploader === user.username);
+                
+                const tr = document.createElement('tr');
+                tr.className = 'border-b hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-medium text-gray-800">${user.username}</td>
+                    <td class="py-3 px-4 text-gray-600">${user.division}</td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-book text-blue-600 mr-2"></i>
+                            <span class="text-sm">${userEbooks.length} file</span>
+                            ${userEbooks.length > 0 ? `
+                                <button onclick="showUserEbooks('${user.username}')" class="ml-2 text-blue-600 hover:text-blue-800 text-sm">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-folder-open text-green-600 mr-2"></i>
+                            <span class="text-sm">${userDocs.length} file</span>
+                            ${userDocs.length > 0 ? `
+                                <button onclick="showUserDocs('${user.username}')" class="ml-2 text-blue-600 hover:text-blue-800 text-sm">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showUserEbooks(username) {
+            const userEbooks = ebooks.filter(e => e.author === username);
+            
+            if (userEbooks.length === 0) {
+                showNotification('Tidak ada ebook untuk user ini', 'info');
+                return;
+            }
+            
+            // Create a modal to show user's ebooks
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Ebook oleh ${username}</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${userEbooks.map(ebook => `
+                            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between mb-3">
+                                    <i class="fas fa-file-word text-3xl text-blue-600"></i>
+                                    <span class="text-xs text-gray-500">${formatDate(ebook.date).split(',')[0]}</span>
+                                </div>
+                                <h3 class="font-bold text-gray-800 mb-2">${ebook.title}</h3>
+                                <p class="text-sm text-gray-600 mb-3">${ebook.description}</p>
+                                <div class="flex justify-between items-center text-xs text-gray-500 mb-3">
+                                    <span><i class="fas fa-tag mr-1"></i>${ebook.category}</span>
+                                    <span><i class="fas fa-hdd mr-1"></i>${ebook.fileSize}</span>
+                                </div>
+                                <button onclick="downloadEbook(${ebook.id}); this.closest('.fixed').remove();" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                                    <i class="fas fa-download mr-2"></i>Download
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showUserDocs(username) {
+            const userDocs = documentation.filter(d => d.uploader === username);
+            
+            if (userDocs.length === 0) {
+                showNotification('Tidak ada dokumentasi project untuk user ini', 'info');
+                return;
+            }
+            
+            // Create a modal to show user's documentation
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Dokumentasi Project oleh ${username}</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${userDocs.map(doc => {
+                            let icon = 'fa-file';
+                            let iconColor = 'text-gray-600';
+                            if (doc.fileType.includes('pdf')) {
+                                icon = 'fa-file-pdf';
+                                iconColor = 'text-red-600';
+                            } else if (doc.fileType.includes('word')) {
+                                icon = 'fa-file-word';
+                                iconColor = 'text-blue-600';
+                            } else if (doc.fileType.includes('image')) {
+                                icon = 'fa-file-image';
+                                iconColor = 'text-green-600';
+                            }
+                            
+                            return `
+                                <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <i class="fas ${icon} text-3xl ${iconColor}"></i>
+                                        <span class="text-xs text-gray-500">${formatDate(doc.date).split(',')[0]}</span>
+                                    </div>
+                                    <h3 class="font-bold text-gray-800 mb-2">${doc.title}</h3>
+                                    <p class="text-sm text-gray-600 mb-3">${doc.description}</p>
+                                    <div class="flex justify-between items-center text-xs text-gray-500 mb-3">
+                                        <span><i class="fas fa-building mr-1"></i>${doc.division}</span>
+                                        <span><i class="fas fa-hdd mr-1"></i>${doc.fileSize}</span>
+                                    </div>
+                                    <button onclick="downloadDoc(${doc.id}); this.closest('.fixed').remove();" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                                        <i class="fas fa-download mr-2"></i>Download
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         // Ebook Functions
