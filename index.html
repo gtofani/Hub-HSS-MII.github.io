@@ -1,963 +1,1014 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSS2 Engineer Hub - PT.MII</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <title>Divisi HSS2 - PT.MII</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --light-bg: #ecf0f1;
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
         }
-
-        body {
-            background-color: var(--light-bg);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .navbar {
-            background-color: var(--primary-color) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        .hover-scale {
+            transition: transform 0.2s;
         }
-
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,.1);
-            transition: transform 0.3s ease;
+        .hover-scale:hover {
+            transform: scale(1.02);
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .btn-primary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-
-        .btn-primary:hover {
-            background-color: #2980b9;
-            border-color: #2980b9;
-        }
-
-        .sidebar {
-            background-color: white;
-            min-height: calc(100vh - 56px);
-            box-shadow: 2px 0 5px rgba(0,0,0,.1);
-        }
-
-        .sidebar .nav-link {
-            color: var(--primary-color);
-            padding: 15px 20px;
-            border-radius: 5px;
-            margin: 5px 10px;
+        .sidebar-item {
             transition: all 0.3s ease;
         }
-
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            background-color: var(--secondary-color);
-            color: white;
+        .sidebar-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
         }
-
-        .calendar-day {
-            min-height: 100px;
-            border: 1px solid #ddd;
-            padding: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .calendar-day:hover {
-            background-color: #f8f9fa;
-        }
-
-        .activity-item {
-            font-size: 0.8em;
-            padding: 2px;
-            margin: 1px 0;
-            background-color: var(--secondary-color);
-            color: white;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .engineer-card {
-            cursor: pointer;
+        .file-card {
             transition: all 0.3s ease;
         }
-
-        .engineer-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,.2);
-        }
-
-        .file-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.3s ease;
-        }
-
-        .file-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .ebook-item {
-            padding: 15px;
-            border-left: 4px solid var(--secondary-color);
-            margin-bottom: 10px;
-            background-color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .ebook-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 2px 5px rgba(0,0,0,.1);
-        }
-
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
-        }
-
-        .admin-badge {
-            background-color: var(--danger-color);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-        }
-
-        .status-badge {
-            font-size: 0.75em;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-
-        .status-active {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .status-inactive {
-            background-color: #95a5a6;
-            color: white;
+        .file-card:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
     </style>
 </head>
-<body>
-    <!-- Toast Container -->
-    <div class="toast-container"></div>
+<body class="bg-gray-50">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <i class="fas fa-cog fa-spin text-6xl text-blue-600 mb-4"></i>
+            <p class="text-gray-600">Memuat sistem...</p>
+        </div>
+    </div>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-hdd-network"></i> HSS2 Engineer Hub
-            </a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text" id="userDisplay">
-                    <i class="bi bi-person-circle"></i> <span id="currentUser">Guest</span>
-                </span>
-                <button class="btn btn-outline-light ms-3" onclick="logout()">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <i class="fas fa-book-open text-5xl text-blue-600 mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800">Divisi HSS2</h1>
+                <p class="text-gray-600 mt-2">PT. MII - Ebook & Dokumentasi</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="loginUsername" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan username" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan password" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">Belum punya akun?</p>
+                <button onclick="showRegistration()" class="text-blue-600 hover:text-blue-700 font-medium mt-2">
+                    <i class="fas fa-user-plus mr-1"></i>Registrasi
                 </button>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <!-- Login/Register Section -->
-    <div id="loginSection" class="container">
-        <div class="login-container">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Login / Register</h4>
+    <!-- Registration Screen -->
+    <div id="registrationScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 to-blue-700 hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <i class="fas fa-user-plus text-5xl text-green-600 mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800">Registrasi Anggota</h1>
+            </div>
+            
+            <form id="registrationForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="regUsername" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Buat username" required>
                 </div>
-                <div class="card-body">
-                    <ul class="nav nav-tabs mb-3" id="authTabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#register">Register</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="login">
-                            <form onsubmit="handleLogin(event)">
-                                <div class="mb-3">
-                                    <label class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="loginUsername" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="loginPassword" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Login</button>
-                            </form>
-                        </div>
-                        <div class="tab-pane fade" id="register">
-                            <form onsubmit="handleRegister(event)">
-                                <div class="mb-3">
-                                    <label class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="regUsername" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="regPassword" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="regFullName" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="regEmail" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Register</button>
-                            </form>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="regPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Buat password" required>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi HSS2</label>
+                    <select id="regDivision" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                        <option value="">Pilih Divisi HSS2</option>
+                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
+                        <option value="HSS2-Electrical">HSS2-Electrical</option>
+                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
+                        <option value="HSS2-Civil">HSS2-Civil</option>
+                        <option value="HSS2-Safety">HSS2-Safety</option>
+                        <option value="HSS2-Quality">HSS2-Quality</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
+                    <i class="fas fa-user-check mr-2"></i>Registrasi
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <button onclick="showLogin()" class="text-gray-600 hover:text-gray-700">
+                    <i class="fas fa-arrow-left mr-1"></i>Kembali ke Login
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Main Application -->
-    <div id="mainApp" class="container-fluid" style="display: none;">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 sidebar">
-                <div class="p-3">
-                    <h5 class="mb-3">Navigation</h5>
-                    <nav class="nav flex-column">
-                        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('activities')">
-                            <i class="bi bi-calendar3"></i> Activities
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('ebooks')">
-                            <i class="bi bi-book"></i> Ebooks
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('documents')">
-                            <i class="bi bi-folder"></i> Documents
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('engineers')" id="engineersLink" style="display: none;">
-                            <i class="bi bi-people"></i> Manage Engineers
-                        </a>
-                    </nav>
+    <div id="mainApp" class="hidden">
+        <!-- Sidebar -->
+        <div class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-40">
+            <div class="p-6 border-b">
+                <div class="flex items-center">
+                    <i class="fas fa-book-open text-3xl text-blue-600 mr-3"></i>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Divisi HSS2</h2>
+                        <p class="text-sm text-gray-600">PT. MII</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="mt-6">
+                <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu Utama</div>
+                <a href="#" onclick="showDashboard()" class="sidebar-item flex items-center px-6 py-3 text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-home w-5 mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" onclick="showEbooks()" class="sidebar-item flex items-center px-6 py-3 text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-book w-5 mr-3"></i>
+                    <span>Ebook & Knowledge Base</span>
+                </a>
+                <a href="#" onclick="showDocumentation()" class="sidebar-item flex items-center px-6 py-3 text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-folder-open w-5 mr-3"></i>
+                    <span>Dokumentasi</span>
+                </a>
+                <a href="#" onclick="showActivities()" class="sidebar-item flex items-center px-6 py-3 text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-calendar-alt w-5 mr-3"></i>
+                    <span>Aktivitas Anggota</span>
+                </a>
+                
+                <div class="px-4 py-2 mt-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Admin</div>
+                <a href="#" onclick="showUserManagement()" class="sidebar-item flex items-center px-6 py-3 text-gray-700 hover:text-blue-600" id="adminMenu" style="display: none;">
+                    <i class="fas fa-users-cog w-5 mr-3"></i>
+                    <span>Manajemen User</span>
+                </a>
+            </nav>
+            
+            <div class="absolute bottom-0 w-full p-4 border-t">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-circle text-2xl text-gray-600 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800" id="currentUser">-</p>
+                            <p class="text-xs text-gray-600" id="currentDivision">-</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 p-8">
+            <!-- Dashboard -->
+            <div id="dashboardContent" class="fade-in">
+                <h1 class="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Total Anggota</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalEngineers">0</p>
+                            </div>
+                            <i class="fas fa-users text-3xl text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Total Ebook</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalEbooks">0</p>
+                            </div>
+                            <i class="fas fa-book text-3xl text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Total Dokumentasi</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalDocs">0</p>
+                            </div>
+                            <i class="fas fa-file-alt text-3xl text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Divisi HSS2</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalDivisions">0</p>
+                            </div>
+                            <i class="fas fa-building text-3xl text-orange-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Aktivitas Terbaru</h2>
+                    <div id="recentActivities" class="space-y-3">
+                        <!-- Activities will be populated here -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Main Content -->
-            <div class="col-md-9 p-4">
-                <!-- Dashboard Section -->
-                <div id="dashboardSection" class="content-section">
-                    <h2 class="mb-4">Dashboard</h2>
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="card text-white bg-primary">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Engineers</h5>
-                                    <h2 id="totalEngineers">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-white bg-success">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Ebooks</h5>
-                                    <h2 id="totalEbooks">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-white bg-warning">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Activities</h5>
-                                    <h2 id="totalActivities">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-white bg-info">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Documents</h5>
-                                    <h2 id="totalDocuments">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Ebooks Content -->
+            <div id="ebooksContent" class="fade-in hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800">Ebook & Knowledge Base</h1>
+                    <button onclick="showCreateEbook()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i>Buat Ebook
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="ebooksList">
+                    <!-- Ebooks will be populated here -->
+                </div>
+            </div>
 
-                    <h3 class="mb-3">Engineers Overview</h3>
-                    <div class="row" id="engineersOverview">
-                        <!-- Engineer cards will be dynamically inserted here -->
+            <!-- Documentation Content -->
+            <div id="documentationContent" class="fade-in hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800">Dokumentasi Instalasi</h1>
+                    <button onclick="showUploadDoc()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200">
+                        <i class="fas fa-upload mr-2"></i>Upload Dokumentasi
+                    </button>
+                </div>
+                
+                <div class="mb-6">
+                    <select id="divisionFilter" onchange="filterDocumentation()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Semua Divisi HSS2</option>
+                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
+                        <option value="HSS2-Electrical">HSS2-Electrical</option>
+                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
+                        <option value="HSS2-Civil">HSS2-Civil</option>
+                        <option value="HSS2-Safety">HSS2-Safety</option>
+                        <option value="HSS2-Quality">HSS2-Quality</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="documentationList">
+                    <!-- Documentation will be populated here -->
+                </div>
+            </div>
+
+            <!-- Activities Content -->
+            <div id="activitiesContent" class="fade-in hidden">
+                <h1 class="text-3xl font-bold text-gray-800 mb-8">Aktivitas Anggota</h1>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Tanggal</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Anggota</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Divisi HSS2</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Aktivitas</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Detail</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activitiesTable">
+                                <!-- Activities will be populated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Activities Section -->
-                <div id="activitiesSection" class="content-section" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Activities Calendar</h2>
-                        <button class="btn btn-primary" onclick="showAddActivityModal()">
-                            <i class="bi bi-plus-circle"></i> Add Activity
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <button class="btn btn-outline-primary" onclick="previousMonth()">
-                                    <i class="bi bi-chevron-left"></i>
-                                </button>
-                                <h4 id="currentMonth"></h4>
-                                <button class="btn btn-outline-primary" onclick="nextMonth()">
-                                    <i class="bi bi-chevron-right"></i>
-                                </button>
-                            </div>
-                            <div class="calendar-grid" id="calendar">
-                                <!-- Calendar will be generated here -->
-                            </div>
-                        </div>
-                    </div>
+            <!-- User Management (Admin Only) -->
+            <div id="userManagementContent" class="fade-in hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800">Manajemen User</h1>
+                    <button onclick="showAddUser()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-200">
+                        <i class="fas fa-user-plus mr-2"></i>Tambah User
+                    </button>
                 </div>
-
-                <!-- Ebooks Section -->
-                <div id="ebooksSection" class="content-section" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Ebooks & Knowledge Base</h2>
-                        <button class="btn btn-primary" onclick="showAddEbookModal()">
-                            <i class="bi bi-plus-circle"></i> Create Ebook
-                        </button>
-                    </div>
-                    <div id="ebooksList">
-                        <!-- Ebooks will be listed here -->
-                    </div>
-                </div>
-
-                <!-- Documents Section -->
-                <div id="documentsSection" class="content-section" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Documents</h2>
-                        <button class="btn btn-primary" onclick="document.getElementById('fileUpload').click()">
-                            <i class="bi bi-upload"></i> Upload Document
-                        </button>
-                        <input type="file" id="fileUpload" style="display: none;" multiple onchange="handleFileUpload(event)">
-                    </div>
-                    <div id="documentsList">
-                        <!-- Documents will be listed here -->
-                    </div>
-                </div>
-
-                <!-- Engineers Management Section (Admin Only) -->
-                <div id="engineersSection" class="content-section" style="display: none;">
-                    <h2 class="mb-4">Manage Engineers</h2>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Username</th>
-                                            <th>Full Name</th>
-                                            <th>Email</th>
-                                            <th>Role</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="engineersTable">
-                                        <!-- Engineers will be listed here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Username</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Divisi HSS2</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <!-- Users will be populated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modals -->
-    <!-- Add Activity Modal -->
-    <div class="modal fade" id="addActivityModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Activity</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Modal for Create Ebook -->
+    <div id="createEbookModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 w-full max-w-2xl">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Buat Ebook Baru</h2>
+            <form id="createEbookForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Judul Ebook</label>
+                    <input type="text" id="ebookTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
                 </div>
-                <div class="modal-body">
-                    <form onsubmit="saveActivity(event)">
-                        <div class="mb-3">
-                            <label class="form-label">Date</label>
-                            <input type="date" class="form-control" id="activityDate" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Activity</label>
-                            <textarea class="form-control" id="activityText" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Activity</button>
-                    </form>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                    <select id="ebookCategory" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Procedure">Procedure</option>
+                        <option value="Manual">Manual</option>
+                        <option value="Guideline">Guideline</option>
+                    </select>
                 </div>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                    <textarea id="ebookDescription" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload File (MS Word)</label>
+                    <input type="file" id="ebookFile" accept=".doc,.docx" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeModal('createEbookModal')" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
+                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Add Ebook Modal -->
-    <div class="modal fade" id="addEbookModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create Ebook</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Modal for Upload Documentation -->
+    <div id="uploadDocModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 w-full max-w-2xl">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Upload Dokumentasi</h2>
+            <form id="uploadDocForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Judul Dokumentasi</label>
+                    <input type="text" id="docTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
                 </div>
-                <div class="modal-body">
-                    <form onsubmit="saveEbook(event)">
-                        <div class="mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-control" id="ebookTitle" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Content</label>
-                            <textarea class="form-control" id="ebookContent" rows="10" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Create Ebook</button>
-                    </form>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi HSS2</label>
+                    <select id="docDivision" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                        <option value="">Pilih Divisi HSS2</option>
+                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
+                        <option value="HSS2-Electrical">HSS2-Electrical</option>
+                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
+                        <option value="HSS2-Civil">HSS2-Civil</option>
+                        <option value="HSS2-Safety">HSS2-Safety</option>
+                        <option value="HSS2-Quality">HSS2-Quality</option>
+                    </select>
                 </div>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                    <textarea id="docDescription" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload File</label>
+                    <input type="file" id="docFile" accept=".pdf,.doc,.docx,.jpg,.png" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeModal('uploadDocModal')" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
+                    <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">Upload</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- View Ebook Modal -->
-    <div class="modal fade" id="viewEbookModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="viewEbookTitle"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Modal for Add User (Admin) -->
+    <div id="addUserModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Tambah User Baru</h2>
+            <form id="addUserForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="newUsername" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
                 </div>
-                <div class="modal-body">
-                    <div id="viewEbookContent"></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="newPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
                 </div>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi HSS2</label>
+                    <select id="newDivision" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                        <option value="">Pilih Divisi HSS2</option>
+                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
+                        <option value="HSS2-Electrical">HSS2-Electrical</option>
+                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
+                        <option value="HSS2-Civil">HSS2-Civil</option>
+                        <option value="HSS2-Safety">HSS2-Safety</option>
+                        <option value="HSS2-Quality">HSS2-Quality</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select id="newRole" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                        <option value="engineer">Anggota</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeModal('addUserModal')" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
+                    <button type="submit" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Tambah</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize data structures
+        // Data Storage
+        let users = JSON.parse(localStorage.getItem('hss2_users')) || [
+            { username: 'admin', password: 'admin123', division: 'HSS2-Mechanical', role: 'admin', status: 'active' }
+        ];
+        let ebooks = JSON.parse(localStorage.getItem('hss2_ebooks')) || [];
+        let documentation = JSON.parse(localStorage.getItem('hss2_documentation')) || [];
+        let activities = JSON.parse(localStorage.getItem('hss2_activities')) || [];
         let currentUser = null;
-        let currentDate = new Date();
-        let engineers = JSON.parse(localStorage.getItem('engineers')) || [];
-        let activities = JSON.parse(localStorage.getItem('activities')) || [];
-        let ebooks = JSON.parse(localStorage.getItem('ebooks')) || [];
-        let documents = JSON.parse(localStorage.getItem('documents')) || {};
 
-        // Initialize with admin user if not exists
-        if (engineers.length === 0) {
-            engineers.push({
-                username: 'admin',
-                password: 'admin123',
-                fullName: 'System Administrator',
-                email: 'admin@ptmii.com',
-                role: 'admin',
-                status: 'active'
-            });
-            localStorage.setItem('engineers', JSON.stringify(engineers));
-        }
+        // Initialize
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+            }, 1000);
+        };
 
-        // Authentication functions
-        function handleLogin(event) {
-            event.preventDefault();
+        // Login Functions
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
             
-            const engineer = engineers.find(e => e.username === username && e.password === password);
-            
-            if (engineer) {
-                currentUser = engineer;
-                document.getElementById('currentUser').textContent = engineer.fullName;
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                document.getElementById('currentUser').textContent = user.username;
+                document.getElementById('currentDivision').textContent = user.division;
                 
-                if (engineer.role === 'admin') {
-                    document.getElementById('engineersLink').style.display = 'block';
+                if (user.role === 'admin') {
+                    document.getElementById('adminMenu').style.display = 'block';
                 }
                 
-                showToast('Login successful!', 'success');
-                loadDashboard();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                showDashboard();
+                addActivity(user.username, user.division, 'Login ke sistem');
             } else {
-                showToast('Invalid username or password', 'danger');
+                showNotification('Username atau password salah!', 'error');
             }
-        }
+        });
 
-        function handleRegister(event) {
-            event.preventDefault();
+        // Registration Functions
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
-            const fullName = document.getElementById('regFullName').value;
-            const email = document.getElementById('regEmail').value;
+            const division = document.getElementById('regDivision').value;
             
-            if (engineers.find(e => e.username === username)) {
-                showToast('Username already exists', 'danger');
+            if (users.find(u => u.username === username)) {
+                showNotification('Username sudah terdaftar!', 'error');
                 return;
             }
             
-            const newEngineer = {
-                username,
-                password,
-                fullName,
-                email,
+            const newUser = {
+                username: username,
+                password: password,
+                division: division,
                 role: 'engineer',
                 status: 'active'
             };
             
-            engineers.push(newEngineer);
-            localStorage.setItem('engineers', JSON.stringify(engineers));
+            users.push(newUser);
+            localStorage.setItem('hss2_users', JSON.stringify(users));
             
-            // Create folder structure (simulated)
-            if (!documents[username]) {
-                documents[username] = {
-                    ebooks: [],
-                    files: []
-                };
-                localStorage.setItem('documents', JSON.stringify(documents));
+            // Create division folder (simulated)
+            if (!localStorage.getItem(`div_${division}`)) {
+                localStorage.setItem(`div_${division}`, JSON.stringify([]));
             }
             
-            showToast('Registration successful! Please login.', 'success');
-            document.querySelector('#authTabs a[href="#login"]').click();
+            showNotification('Registrasi berhasil! Silakan login.', 'success');
+            showLogin();
+            this.reset();
+        });
+
+        function showRegistration() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registrationScreen').classList.remove('hidden');
         }
 
-        function logout() {
-            currentUser = null;
-            document.getElementById('currentUser').textContent = 'Guest';
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('mainApp').style.display = 'none';
-            document.getElementById('engineersLink').style.display = 'none';
+        function showLogin() {
+            document.getElementById('registrationScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        // Navigation functions
-        function showSection(section) {
-            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-            document.getElementById(section + 'Section').style.display = 'block';
-            
-            document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
-            event.target.closest('.nav-link').classList.add('active');
-            
-            switch(section) {
-                case 'dashboard':
-                    loadDashboard();
-                    break;
-                case 'activities':
-                    loadCalendar();
-                    break;
-                case 'ebooks':
-                    loadEbooks();
-                    break;
-                case 'documents':
-                    loadDocuments();
-                    break;
-                case 'engineers':
-                    loadEngineersTable();
-                    break;
-            }
+        // Navigation Functions
+        function showDashboard() {
+            hideAllContent();
+            document.getElementById('dashboardContent').classList.remove('hidden');
+            updateDashboardStats();
+            updateRecentActivities();
         }
 
-        // Dashboard functions
-        function loadDashboard() {
-            // Update statistics
-            document.getElementById('totalEngineers').textContent = engineers.length;
+        function showEbooks() {
+            hideAllContent();
+            document.getElementById('ebooksContent').classList.remove('hidden');
+            displayEbooks();
+        }
+
+        function showDocumentation() {
+            hideAllContent();
+            document.getElementById('documentationContent').classList.remove('hidden');
+            displayDocumentation();
+        }
+
+        function showActivities() {
+            hideAllContent();
+            document.getElementById('activitiesContent').classList.remove('hidden');
+            displayActivities();
+        }
+
+        function showUserManagement() {
+            hideAllContent();
+            document.getElementById('userManagementContent').classList.remove('hidden');
+            displayUsers();
+        }
+
+        function hideAllContent() {
+            document.getElementById('dashboardContent').classList.add('hidden');
+            document.getElementById('ebooksContent').classList.add('hidden');
+            document.getElementById('documentationContent').classList.add('hidden');
+            document.getElementById('activitiesContent').classList.add('hidden');
+            document.getElementById('userManagementContent').classList.add('hidden');
+        }
+
+        // Dashboard Functions
+        function updateDashboardStats() {
+            document.getElementById('totalEngineers').textContent = users.length;
             document.getElementById('totalEbooks').textContent = ebooks.length;
-            document.getElementById('totalActivities').textContent = activities.length;
+            document.getElementById('totalDocs').textContent = documentation.length;
             
-            let totalDocs = 0;
-            Object.values(documents).forEach(userDocs => {
-                totalDocs += userDocs.files ? userDocs.files.length : 0;
-            });
-            document.getElementById('totalDocuments').textContent = totalDocs;
+            const divisions = [...new Set(users.map(u => u.division))];
+            document.getElementById('totalDivisions').textContent = divisions.length;
+        }
+
+        function updateRecentActivities() {
+            const recentActivities = activities.slice(-5).reverse();
+            const container = document.getElementById('recentActivities');
+            container.innerHTML = '';
             
-            // Load engineers overview
-            const overview = document.getElementById('engineersOverview');
-            overview.innerHTML = '';
-            
-            engineers.forEach(engineer => {
-                const card = document.createElement('div');
-                card.className = 'col-md-4 mb-3';
-                card.innerHTML = `
-                    <div class="card engineer-card" onclick="viewEngineerDetails('${engineer.username}')">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                ${engineer.fullName}
-                                ${engineer.role === 'admin' ? '<span class="admin-badge ms-2">Admin</span>' : ''}
-                            </h5>
-                            <p class="card-text">
-                                <i class="bi bi-person"></i> ${engineer.username}<br>
-                                <i class="bi bi-envelope"></i> ${engineer.email}<br>
-                                <span class="status-badge ${engineer.status === 'active' ? 'status-active' : 'status-inactive'}">
-                                    ${engineer.status}
-                                </span>
-                            </p>
+            recentActivities.forEach(activity => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                div.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-circle text-xs text-blue-600 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">${activity.user}</p>
+                            <p class="text-xs text-gray-600">${activity.action}</p>
                         </div>
                     </div>
+                    <span class="text-xs text-gray-500">${formatDate(activity.date)}</span>
                 `;
-                overview.appendChild(card);
+                container.appendChild(div);
             });
         }
 
-        // Calendar functions
-        function loadCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            
-            document.getElementById('currentMonth').textContent = 
-                new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-            
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
-            const calendar = document.getElementById('calendar');
-            calendar.innerHTML = '';
-            
-            // Day headers
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'col text-center fw-bold';
-                header.textContent = day;
-                calendar.appendChild(header);
-            });
-            
-            // Empty cells before first day
-            for (let i = 0; i < firstDay; i++) {
-                calendar.appendChild(document.createElement('div'));
-            }
-            
-            // Days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayCell = document.createElement('div');
-                dayCell.className = 'col calendar-day';
-                dayCell.innerHTML = `<div class="fw-bold">${day}</div>`;
-                
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayActivities = activities.filter(a => a.date === dateStr && a.username === currentUser.username);
-                
-                dayActivities.forEach(activity => {
-                    const activityDiv = document.createElement('div');
-                    activityDiv.className = 'activity-item';
-                    activityDiv.textContent = activity.text.substring(0, 20) + '...';
-                    activityDiv.onclick = () => editActivity(activity);
-                    dayCell.appendChild(activityDiv);
-                });
-                
-                dayCell.onclick = (e) => {
-                    if (e.target === dayCell || e.target.classList.contains('fw-bold')) {
-                        document.getElementById('activityDate').value = dateStr;
-                        new bootstrap.Modal(document.getElementById('addActivityModal')).show();
-                    }
-                };
-                
-                calendar.appendChild(dayCell);
-            }
+        // Ebook Functions
+        function showCreateEbook() {
+            document.getElementById('createEbookModal').classList.remove('hidden');
         }
 
-        function previousMonth() {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            loadCalendar();
-        }
-
-        function nextMonth() {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            loadCalendar();
-        }
-
-        function showAddActivityModal() {
-            document.getElementById('activityDate').value = new Date().toISOString().split('T')[0];
-            new bootstrap.Modal(document.getElementById('addActivityModal')).show();
-        }
-
-        function saveActivity(event) {
-            event.preventDefault();
-            const date = document.getElementById('activityDate').value;
-            const text = document.getElementById('activityText').value;
-            
-            const activity = {
-                id: Date.now(),
-                username: currentUser.username,
-                date,
-                text
-            };
-            
-            activities.push(activity);
-            localStorage.setItem('activities', JSON.stringify(activities));
-            
-            bootstrap.Modal.getInstance(document.getElementById('addActivityModal')).hide();
-            showToast('Activity saved successfully!', 'success');
-            loadCalendar();
-        }
-
-        function editActivity(activity) {
-            document.getElementById('activityDate').value = activity.date;
-            document.getElementById('activityText').value = activity.text;
-            
-            const modal = new bootstrap.Modal(document.getElementById('addActivityModal'));
-            modal.show();
-            
-            // Remove old activity
-            activities = activities.filter(a => a.id !== activity.id);
-            localStorage.setItem('activities', JSON.stringify(activities));
-        }
-
-        // Ebooks functions
-        function loadEbooks() {
-            const ebooksList = document.getElementById('ebooksList');
-            ebooksList.innerHTML = '';
-            
-            const userEbooks = ebooks.filter(e => e.username === currentUser.username);
-            
-            if (userEbooks.length === 0) {
-                ebooksList.innerHTML = '<p class="text-muted">No ebooks created yet.</p>';
-                return;
-            }
-            
-            userEbooks.forEach(ebook => {
-                const ebookDiv = document.createElement('div');
-                ebookDiv.className = 'ebook-item';
-                ebookDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5>${ebook.title}</h5>
-                            <small class="text-muted">Created: ${new Date(ebook.createdAt).toLocaleDateString()}</small>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-outline-primary me-2" onclick="viewEbook(${ebook.id})">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEbook(${ebook.id})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                ebooksList.appendChild(ebookDiv);
-            });
-        }
-
-        function showAddEbookModal() {
-            new bootstrap.Modal(document.getElementById('addEbookModal')).show();
-        }
-
-        function saveEbook(event) {
-            event.preventDefault();
+        document.getElementById('createEbookForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             const title = document.getElementById('ebookTitle').value;
-            const content = document.getElementById('ebookContent').value;
+            const category = document.getElementById('ebookCategory').value;
+            const description = document.getElementById('ebookDescription').value;
+            const file = document.getElementById('ebookFile').files[0];
             
             const ebook = {
                 id: Date.now(),
-                username: currentUser.username,
-                title,
-                content,
-                createdAt: new Date().toISOString()
+                title: title,
+                category: category,
+                description: description,
+                author: currentUser.username,
+                division: currentUser.division,
+                fileName: file.name,
+                fileSize: formatFileSize(file.size),
+                date: new Date().toISOString()
             };
             
             ebooks.push(ebook);
-            localStorage.setItem('ebooks', JSON.stringify(ebooks));
+            localStorage.setItem('hss2_ebooks', JSON.stringify(ebooks));
             
-            bootstrap.Modal.getInstance(document.getElementById('addEbookModal')).hide();
-            showToast('Ebook created successfully!', 'success');
-            loadEbooks();
+            addActivity(currentUser.username, currentUser.division, `Membuat ebook: ${title}`);
+            showNotification('Ebook berhasil dibuat!', 'success');
+            closeModal('createEbookModal');
+            this.reset();
+            displayEbooks();
+        });
+
+        function displayEbooks() {
+            const container = document.getElementById('ebooksList');
+            container.innerHTML = '';
+            
+            ebooks.forEach(ebook => {
+                const div = document.createElement('div');
+                div.className = 'file-card bg-white rounded-xl shadow-md p-6 cursor-pointer';
+                div.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <i class="fas fa-file-word text-4xl text-blue-600"></i>
+                        <span class="text-xs text-gray-500">${formatDate(ebook.date)}</span>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2">${ebook.title}</h3>
+                    <p class="text-sm text-gray-600 mb-3">${ebook.description}</p>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <span><i class="fas fa-user mr-1"></i>${ebook.author}</span>
+                        <span><i class="fas fa-building mr-1"></i>${ebook.division}</span>
+                    </div>
+                    <div class="mt-4 flex space-x-2">
+                        <button onclick="downloadEbook(${ebook.id})" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-sm">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </button>
+                        ${currentUser.role === 'admin' || currentUser.username === ebook.author ? `
+                            <button onclick="deleteEbook(${ebook.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200 text-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        function viewEbook(id) {
+        function downloadEbook(id) {
             const ebook = ebooks.find(e => e.id === id);
             if (ebook) {
-                document.getElementById('viewEbookTitle').textContent = ebook.title;
-                document.getElementById('viewEbookContent').innerHTML = 
-                    `<pre style="white-space: pre-wrap;">${ebook.content}</pre>`;
-                new bootstrap.Modal(document.getElementById('viewEbookModal')).show();
+                addActivity(currentUser.username, currentUser.division, `Mengunduh ebook: ${ebook.title}`);
+                showNotification(`Mengunduh ${ebook.fileName}...`, 'info');
             }
         }
 
         function deleteEbook(id) {
-            if (confirm('Are you sure you want to delete this ebook?')) {
-                ebooks = ebooks.filter(e => e.id !== id);
-                localStorage.setItem('ebooks', JSON.stringify(ebooks));
-                showToast('Ebook deleted successfully!', 'success');
-                loadEbooks();
+            if (confirm('Apakah Anda yakin ingin menghapus ebook ini?')) {
+                const index = ebooks.findIndex(e => e.id === id);
+                if (index > -1) {
+                    const ebook = ebooks[index];
+                    ebooks.splice(index, 1);
+                    localStorage.setItem('hss2_ebooks', JSON.stringify(ebooks));
+                    addActivity(currentUser.username, currentUser.division, `Menghapus ebook: ${ebook.title}`);
+                    showNotification('Ebook berhasil dihapus!', 'success');
+                    displayEbooks();
+                }
             }
         }
 
-        // Documents functions
-        function loadDocuments() {
-            const documentsList = document.getElementById('documentsList');
-            documentsList.innerHTML = '';
-            
-            const userDocs = documents[currentUser.username];
-            if (!userDocs || !userDocs.files || userDocs.files.length === 0) {
-                documentsList.innerHTML = '<p class="text-muted">No documents uploaded yet.</p>';
-                return;
-            }
-            
-            userDocs.files.forEach(file => {
-                const fileDiv = document.createElement('div');
-                fileDiv.className = 'file-item';
-                fileDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-file-earmark"></i> ${file.name}
-                            <small class="text-muted ms-2">${(file.size / 1024).toFixed(2)} KB</small>
-                        </div>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument('${file.name}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                `;
-                documentsList.appendChild(fileDiv);
-            });
+        // Documentation Functions
+        function showUploadDoc() {
+            document.getElementById('uploadDocModal').classList.remove('hidden');
         }
 
-        function handleFileUpload(event) {
-            const files = event.target.files;
+        document.getElementById('uploadDocForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('docTitle').value;
+            const division = document.getElementById('docDivision').value;
+            const description = document.getElementById('docDescription').value;
+            const file = document.getElementById('docFile').files[0];
             
-            if (!documents[currentUser.username]) {
-                documents[currentUser.username] = { files: [] };
-            }
+            const doc = {
+                id: Date.now(),
+                title: title,
+                division: division,
+                description: description,
+                uploader: currentUser.username,
+                fileName: file.name,
+                fileSize: formatFileSize(file.size),
+                fileType: file.type,
+                date: new Date().toISOString()
+            };
             
-            Array.from(files).forEach(file => {
-                const fileData = {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    uploadedAt: new Date().toISOString()
-                };
+            documentation.push(doc);
+            localStorage.setItem('hss2_documentation', JSON.stringify(documentation));
+            
+            // Add to division folder (simulated)
+            const divDocs = JSON.parse(localStorage.getItem(`div_${division}`)) || [];
+            divDocs.push(doc);
+            localStorage.setItem(`div_${division}`, JSON.stringify(divDocs));
+            
+            addActivity(currentUser.username, division, `Mengupload dokumentasi: ${title}`);
+            showNotification('Dokumentasi berhasil diupload!', 'success');
+            closeModal('uploadDocModal');
+            this.reset();
+            displayDocumentation();
+        });
+
+        function displayDocumentation() {
+            const filter = document.getElementById('divisionFilter').value;
+            const container = document.getElementById('documentationList');
+            container.innerHTML = '';
+            
+            const filteredDocs = filter ? documentation.filter(d => d.division === filter) : documentation;
+            
+            filteredDocs.forEach(doc => {
+                const div = document.createElement('div');
+                div.className = 'file-card bg-white rounded-xl shadow-md p-6';
                 
-                documents[currentUser.username].files.push(fileData);
+                let icon = 'fa-file';
+                if (doc.fileType.includes('pdf')) icon = 'fa-file-pdf';
+                else if (doc.fileType.includes('word')) icon = 'fa-file-word';
+                else if (doc.fileType.includes('image')) icon = 'fa-file-image';
+                
+                div.innerHTML = `
+                    <div class="text-center mb-4">
+                        <i class="fas ${icon} text-5xl text-purple-600"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2 text-center">${doc.title}</h3>
+                    <p class="text-sm text-gray-600 mb-3 text-center">${doc.description}</p>
+                    <div class="space-y-1 text-xs text-gray-500">
+                        <p class="text-center"><i class="fas fa-building mr-1"></i>${doc.division}</p>
+                        <p class="text-center"><i class="fas fa-user mr-1"></i>${doc.uploader}</p>
+                        <p class="text-center"><i class="fas fa-hdd mr-1"></i>${doc.fileSize}</p>
+                    </div>
+                    <div class="mt-4 flex space-x-2">
+                        <button onclick="downloadDoc(${doc.id})" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200 text-sm">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </button>
+                        ${currentUser.role === 'admin' || currentUser.username === doc.uploader ? `
+                            <button onclick="deleteDoc(${doc.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200 text-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
             });
-            
-            localStorage.setItem('documents', JSON.stringify(documents));
-            showToast('Documents uploaded successfully!', 'success');
-            loadDocuments();
         }
 
-        function deleteDocument(fileName) {
-            if (confirm('Are you sure you want to delete this document?')) {
-                documents[currentUser.username].files = 
-                    documents[currentUser.username].files.filter(f => f.name !== fileName);
-                localStorage.setItem('documents', JSON.stringify(documents));
-                showToast('Document deleted successfully!', 'success');
-                loadDocuments();
+        function filterDocumentation() {
+            displayDocumentation();
+        }
+
+        function downloadDoc(id) {
+            const doc = documentation.find(d => d.id === id);
+            if (doc) {
+                addActivity(currentUser.username, doc.division, `Mengunduh dokumentasi: ${doc.title}`);
+                showNotification(`Mengunduh ${doc.fileName}...`, 'info');
             }
         }
 
-        // Admin functions
-        function loadEngineersTable() {
-            const table = document.getElementById('engineersTable');
-            table.innerHTML = '';
+        function deleteDoc(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus dokumentasi ini?')) {
+                const index = documentation.findIndex(d => d.id === id);
+                if (index > -1) {
+                    const doc = documentation[index];
+                    documentation.splice(index, 1);
+                    localStorage.setItem('hss2_documentation', JSON.stringify(documentation));
+                    
+                    // Remove from division folder (simulated)
+                    const divDocs = JSON.parse(localStorage.getItem(`div_${doc.division}`)) || [];
+                    const divIndex = divDocs.findIndex(d => d.id === id);
+                    if (divIndex > -1) {
+                        divDocs.splice(divIndex, 1);
+                        localStorage.setItem(`div_${doc.division}`, JSON.stringify(divDocs));
+                    }
+                    
+                    addActivity(currentUser.username, doc.division, `Menghapus dokumentasi: ${doc.title}`);
+                    showNotification('Dokumentasi berhasil dihapus!', 'success');
+                    displayDocumentation();
+                }
+            }
+        }
+
+        // Activities Functions
+        function displayActivities() {
+            const tbody = document.getElementById('activitiesTable');
+            tbody.innerHTML = '';
             
-            engineers.forEach(engineer => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${engineer.username}</td>
-                    <td>${engineer.fullName}</td>
-                    <td>${engineer.email}</td>
-                    <td>
-                        <span class="badge ${engineer.role === 'admin' ? 'bg-danger' : 'bg-primary'}">
-                            ${engineer.role}
+            activities.slice().reverse().forEach(activity => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="py-3 px-4">${formatDate(activity.date)}</td>
+                    <td class="py-3 px-4">${activity.user}</td>
+                    <td class="py-3 px-4">${activity.division}</td>
+                    <td class="py-3 px-4">${activity.action}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${getActivityBadgeClass(activity.action)}">
+                            ${getActivityType(activity.action)}
                         </span>
-                    </td>
-                    <td>
-                        <span class="status-badge ${engineer.status === 'active' ? 'status-active' : 'status-inactive'}">
-                            ${engineer.status}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-2" onclick="toggleEngineerStatus('${engineer.username}')">
-                            <i class="bi bi-toggle-on"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEngineer('${engineer.username}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
                     </td>
                 `;
-                table.appendChild(row);
+                tbody.appendChild(tr);
             });
         }
 
-        function toggleEngineerStatus(username) {
-            const engineer = engineers.find(e => e.username === username);
-            if (engineer) {
-                engineer.status = engineer.status === 'active' ? 'inactive' : 'active';
-                localStorage.setItem('engineers', JSON.stringify(engineers));
-                showToast(`Engineer ${engineer.status}!`, 'success');
-                loadEngineersTable();
-            }
+        function addActivity(user, division, action) {
+            const activity = {
+                user: user,
+                division: division,
+                action: action,
+                date: new Date().toISOString()
+            };
+            activities.push(activity);
+            localStorage.setItem('hss2_activities', JSON.stringify(activities));
         }
 
-        function deleteEngineer(username) {
-            if (username === 'admin') {
-                showToast('Cannot delete admin user!', 'danger');
+        function getActivityBadgeClass(action) {
+            if (action.includes('Login')) return 'bg-green-100 text-green-800';
+            if (action.includes('Membuat') || action.includes('Mengupload')) return 'bg-blue-100 text-blue-800';
+            if (action.includes('Mengunduh')) return 'bg-purple-100 text-purple-800';
+            if (action.includes('Menghapus')) return 'bg-red-100 text-red-800';
+            return 'bg-gray-100 text-gray-800';
+        }
+
+        function getActivityType(action) {
+            if (action.includes('Login')) return 'Login';
+            if (action.includes('Membuat') || action.includes('Mengupload')) return 'Create';
+            if (action.includes('Mengunduh')) return 'Download';
+            if (action.includes('Menghapus')) return 'Delete';
+            return 'Other';
+        }
+
+        // User Management Functions
+        function showAddUser() {
+            document.getElementById('addUserModal').classList.remove('hidden');
+        }
+
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            const division = document.getElementById('newDivision').value;
+            const role = document.getElementById('newRole').value;
+            
+            if (users.find(u => u.username === username)) {
+                showNotification('Username sudah terdaftar!', 'error');
                 return;
             }
             
-            if (confirm('Are you sure you want to delete this engineer?')) {
-                engineers = engineers.filter(e => e.username !== username);
-                localStorage.setItem('engineers', JSON.stringify(engineers));
-                showToast('Engineer deleted successfully!', 'success');
-                loadEngineersTable();
+            const newUser = {
+                username: username,
+                password: password,
+                division: division,
+                role: role,
+                status: 'active'
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('hss2_users', JSON.stringify(users));
+            
+            addActivity(currentUser.username, currentUser.division, `Menambahkan user: ${username}`);
+            showNotification('User berhasil ditambahkan!', 'success');
+            closeModal('addUserModal');
+            this.reset();
+            displayUsers();
+        });
+
+        function displayUsers() {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="py-3 px-4">${user.username}</td>
+                    <td class="py-3 px-4">${user.division}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
+                            ${user.role === 'admin' ? 'Admin' : 'Anggota'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <button onclick="toggleUserStatus('${user.username}')" class="text-blue-600 hover:text-blue-700 mr-3">
+                            <i class="fas fa-toggle-${user.status === 'active' ? 'on' : 'off'}"></i>
+                        </button>
+                        <button onclick="deleteUser('${user.username}')" class="text-red-600 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleUserStatus(username) {
+            const user = users.find(u => u.username === username);
+            if (user && user.username !== 'admin') {
+                user.status = user.status === 'active' ? 'inactive' : 'active';
+                localStorage.setItem('hss2_users', JSON.stringify(users));
+                addActivity(currentUser.username, currentUser.division, `Mengubah status user: ${username}`);
+                showNotification(`Status user ${username} berhasil diubah!`, 'success');
+                displayUsers();
             }
         }
 
-        function viewEngineerDetails(username) {
-            const engineer = engineers.find(e => e.username === username);
-            if (engineer) {
-                showToast(`Viewing ${engineer.fullName}'s details`, 'info');
-                // In a real application, this would navigate to a detailed view
+        function deleteUser(username) {
+            if (username === 'admin') {
+                showNotification('Tidak dapat menghapus user admin!', 'error');
+                return;
+            }
+            
+            if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
+                const index = users.findIndex(u => u.username === username);
+                if (index > -1) {
+                    users.splice(index, 1);
+                    localStorage.setItem('hss2_users', JSON.stringify(users));
+                    addActivity(currentUser.username, currentUser.division, `Menghapus user: ${username}`);
+                    showNotification('User berhasil dihapus!', 'success');
+                    displayUsers();
+                }
             }
         }
 
-        // Utility functions
-        function showToast(message, type = 'info') {
-            const toastContainer = document.querySelector('.toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${type} border-0`;
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        // Utility Functions
+        function logout() {
+            if (currentUser) {
+                addActivity(currentUser.username, currentUser.division, 'Logout dari sistem');
+            }
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+            document.getElementById('adminMenu').style.display = 'none';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 fade-in ${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 
+                'bg-blue-600'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${
+                        type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 
+                        'fa-info-circle'
+                    } mr-2"></i>
+                    ${message}
                 </div>
             `;
+            document.body.appendChild(notification);
             
-            toastContainer.appendChild(toast);
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-            
-            toast.addEventListener('hidden.bs.toast', () => {
-                toast.remove();
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
         }
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in (in a real app, this would use cookies/sessions)
-            // For demo, we start with login screen
-        });
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('bg-black')) {
+                event.target.classList.add('hidden');
+            }
+        }
     </script>
 </body>
 </html>
