@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divisi HSS2 - PT.MII</title>
+    <title>Divisi SDS - PT.MII</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -49,7 +49,7 @@
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md fade-in">
             <div class="text-center mb-8">
                 <i class="fas fa-book-open text-5xl text-blue-600 mb-4"></i>
-                <h1 class="text-3xl font-bold text-gray-800">Divisi HSS2</h1>
+                <h1 class="text-3xl font-bold text-gray-800">Divisi SDS</h1>
                 <p class="text-gray-600 mt-2">PT. MII - Ebook & Dokumentasi</p>
             </div>
             
@@ -94,15 +94,18 @@
                     <input type="password" id="regPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Buat password" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi HSS2</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi SDS</label>
                     <select id="regDivision" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
-                        <option value="">Pilih Divisi HSS2</option>
-                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
-                        <option value="HSS2-Electrical">HSS2-Electrical</option>
-                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
-                        <option value="HSS2-Civil">HSS2-Civil</option>
-                        <option value="HSS2-Safety">HSS2-Safety</option>
-                        <option value="HSS2-Quality">HSS2-Quality</option>
+                        <option value="">Pilih Divisi SDS</option>
+                        <option value="HSS1">HSS1</option>
+                        <option value="HSS2">HSS2</option>
+                        <option value="CID1">CID1</option>
+                        <option value="CID2">CID2</option>
+                        <option value="CID3">CID3</option>
+                        <option value="CID4">CID4</option>
+                        <option value="CMS1">CMS1</option>
+                        <option value="SSS1">SSS1</option>
+                        <option value="Network Consulting">Network Consulting</option>
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
@@ -126,7 +129,7 @@
                 <div class="flex items-center">
                     <i class="fas fa-book-open text-3xl text-blue-600 mr-3"></i>
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800">Divisi HSS2</h2>
+                        <h2 class="text-xl font-bold text-gray-800">Divisi SDS</h2>
                         <p class="text-sm text-gray-600">PT. MII</p>
                     </div>
                 </div>
@@ -211,7 +214,7 @@
                     <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-600 text-sm">Divisi HSS2</p>
+                                <p class="text-gray-600 text-sm">Divisi SDS</p>
                                 <p class="text-2xl font-bold text-gray-800" id="totalDivisions">0</p>
                             </div>
                             <i class="fas fa-building text-3xl text-orange-600"></i>
@@ -253,13 +256,16 @@
                 
                 <div class="mb-6">
                     <select id="divisionFilter" onchange="filterDocumentation()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Semua Divisi HSS2</option>
-                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
-                        <option value="HSS2-Electrical">HSS2-Electrical</option>
-                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
-                        <option value="HSS2-Civil">HSS2-Civil</option>
-                        <option value="HSS2-Safety">HSS2-Safety</option>
-                        <option value="HSS2-Quality">HSS2-Quality</option>
+                        <option value="">Semua Divisi SDS</option>
+                        <option value="HSS1">HSS1</option>
+                        <option value="HSS2">HSS2</option>
+                        <option value="CID1">CID1</option>
+                        <option value="CID2">CID2</option>
+                        <option value="CID3">CID3</option>
+                        <option value="CID4">CID4</option>
+                        <option value="CMS1">CMS1</option>
+                        <option value="SSS1">SSS1</option>
+                        <option value="Network Consulting">Network Consulting</option>
                     </select>
                 </div>
                 
@@ -279,7 +285,7 @@
                                 <tr class="border-b">
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Tanggal</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Anggota</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Divisi HSS2</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Divisi SDS</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Aktivitas</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Detail</th>
                                 </tr>
@@ -307,7 +313,7 @@
                             <thead>
                                 <tr class="border-b">
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Username</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Divisi HSS2</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Divisi SDS</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Aksi</th>
@@ -368,15 +374,18 @@
                     <input type="text" id="docTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi HSS2</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi SDS</label>
                     <select id="docDivision" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
-                        <option value="">Pilih Divisi HSS2</option>
-                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
-                        <option value="HSS2-Electrical">HSS2-Electrical</option>
-                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
-                        <option value="HSS2-Civil">HSS2-Civil</option>
-                        <option value="HSS2-Safety">HSS2-Safety</option>
-                        <option value="HSS2-Quality">HSS2-Quality</option>
+                        <option value="">Pilih Divisi SDS</option>
+                        <option value="HSS1">HSS1</option>
+                        <option value="HSS2">HSS2</option>
+                        <option value="CID1">CID1</option>
+                        <option value="CID2">CID2</option>
+                        <option value="CID3">CID3</option>
+                        <option value="CID4">CID4</option>
+                        <option value="CMS1">CMS1</option>
+                        <option value="SSS1">SSS1</option>
+                        <option value="Network Consulting">Network Consulting</option>
                     </select>
                 </div>
                 <div>
@@ -409,15 +418,18 @@
                     <input type="password" id="newPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi HSS2</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Divisi SDS</label>
                     <select id="newDivision" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
-                        <option value="">Pilih Divisi HSS2</option>
-                        <option value="HSS2-Mechanical">HSS2-Mechanical</option>
-                        <option value="HSS2-Electrical">HSS2-Electrical</option>
-                        <option value="HSS2-Instrumentation">HSS2-Instrumentation</option>
-                        <option value="HSS2-Civil">HSS2-Civil</option>
-                        <option value="HSS2-Safety">HSS2-Safety</option>
-                        <option value="HSS2-Quality">HSS2-Quality</option>
+                        <option value="">Pilih Divisi SDS</option>
+                        <option value="HSS1">HSS1</option>
+                        <option value="HSS2">HSS2</option>
+                        <option value="CID1">CID1</option>
+                        <option value="CID2">CID2</option>
+                        <option value="CID3">CID3</option>
+                        <option value="CID4">CID4</option>
+                        <option value="CMS1">CMS1</option>
+                        <option value="SSS1">SSS1</option>
+                        <option value="Network Consulting">Network Consulting</option>
                     </select>
                 </div>
                 <div>
@@ -437,12 +449,12 @@
 
     <script>
         // Data Storage
-        let users = JSON.parse(localStorage.getItem('hss2_users')) || [
-            { username: 'admin', password: 'admin123', division: 'HSS2-Mechanical', role: 'admin', status: 'active' }
+        let users = JSON.parse(localStorage.getItem('sds_users')) || [
+            { username: 'admin', password: 'admin123', division: 'HSS1', role: 'admin', status: 'active' }
         ];
-        let ebooks = JSON.parse(localStorage.getItem('hss2_ebooks')) || [];
-        let documentation = JSON.parse(localStorage.getItem('hss2_documentation')) || [];
-        let activities = JSON.parse(localStorage.getItem('hss2_activities')) || [];
+        let ebooks = JSON.parse(localStorage.getItem('sds_ebooks')) || [];
+        let documentation = JSON.parse(localStorage.getItem('sds_documentation')) || [];
+        let activities = JSON.parse(localStorage.getItem('sds_activities')) || [];
         let currentUser = null;
 
         // Initialize
@@ -498,7 +510,7 @@
             };
             
             users.push(newUser);
-            localStorage.setItem('hss2_users', JSON.stringify(users));
+            localStorage.setItem('sds_users', JSON.stringify(users));
             
             // Create division folder (simulated)
             if (!localStorage.getItem(`div_${division}`)) {
@@ -617,7 +629,7 @@
             };
             
             ebooks.push(ebook);
-            localStorage.setItem('hss2_ebooks', JSON.stringify(ebooks));
+            localStorage.setItem('sds_ebooks', JSON.stringify(ebooks));
             
             addActivity(currentUser.username, currentUser.division, `Membuat ebook: ${title}`);
             showNotification('Ebook berhasil dibuat!', 'success');
@@ -673,7 +685,7 @@
                 if (index > -1) {
                     const ebook = ebooks[index];
                     ebooks.splice(index, 1);
-                    localStorage.setItem('hss2_ebooks', JSON.stringify(ebooks));
+                    localStorage.setItem('sds_ebooks', JSON.stringify(ebooks));
                     addActivity(currentUser.username, currentUser.division, `Menghapus ebook: ${ebook.title}`);
                     showNotification('Ebook berhasil dihapus!', 'success');
                     displayEbooks();
@@ -706,7 +718,7 @@
             };
             
             documentation.push(doc);
-            localStorage.setItem('hss2_documentation', JSON.stringify(documentation));
+            localStorage.setItem('sds_documentation', JSON.stringify(documentation));
             
             // Add to division folder (simulated)
             const divDocs = JSON.parse(localStorage.getItem(`div_${division}`)) || [];
@@ -780,7 +792,7 @@
                 if (index > -1) {
                     const doc = documentation[index];
                     documentation.splice(index, 1);
-                    localStorage.setItem('hss2_documentation', JSON.stringify(documentation));
+                    localStorage.setItem('sds_documentation', JSON.stringify(documentation));
                     
                     // Remove from division folder (simulated)
                     const divDocs = JSON.parse(localStorage.getItem(`div_${doc.division}`)) || [];
@@ -828,7 +840,7 @@
                 date: new Date().toISOString()
             };
             activities.push(activity);
-            localStorage.setItem('hss2_activities', JSON.stringify(activities));
+            localStorage.setItem('sds_activities', JSON.stringify(activities));
         }
 
         function getActivityBadgeClass(action) {
@@ -873,7 +885,7 @@
             };
             
             users.push(newUser);
-            localStorage.setItem('hss2_users', JSON.stringify(users));
+            localStorage.setItem('sds_users', JSON.stringify(users));
             
             addActivity(currentUser.username, currentUser.division, `Menambahkan user: ${username}`);
             showNotification('User berhasil ditambahkan!', 'success');
@@ -919,7 +931,7 @@
             const user = users.find(u => u.username === username);
             if (user && user.username !== 'admin') {
                 user.status = user.status === 'active' ? 'inactive' : 'active';
-                localStorage.setItem('hss2_users', JSON.stringify(users));
+                localStorage.setItem('sds_users', JSON.stringify(users));
                 addActivity(currentUser.username, currentUser.division, `Mengubah status user: ${username}`);
                 showNotification(`Status user ${username} berhasil diubah!`, 'success');
                 displayUsers();
@@ -936,7 +948,7 @@
                 const index = users.findIndex(u => u.username === username);
                 if (index > -1) {
                     users.splice(index, 1);
-                    localStorage.setItem('hss2_users', JSON.stringify(users));
+                    localStorage.setItem('sds_users', JSON.stringify(users));
                     addActivity(currentUser.username, currentUser.division, `Menghapus user: ${username}`);
                     showNotification('User berhasil dihapus!', 'success');
                     displayUsers();
