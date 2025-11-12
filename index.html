@@ -182,7 +182,7 @@
                     <i class="fas fa-folder-open w-5 mr-3"></i>
                     <span>Dokumentasi Project</span>
                 </a>
-                <a href="#" onclick="showActivities()" class="sidebar-item flex items-center px-6 py-3 text-gray-700 hover:text-blue-600">
+                <a href="#" onclick="showActivities()" class="sidebar-item flex items-center px-6 py-3 text-gray-700 hover:text-blue-600" id="activitiesMenu" style="display: none;">
                     <i class="fas fa-calendar-alt w-5 mr-3"></i>
                     <span>Aktivitas Anggota</span>
                 </a>
@@ -255,11 +255,45 @@
                     </div>
                 </div>
 
-                <!-- Recent Activities -->
-                <div class="bg-white rounded-xl shadow-md p-6">
+                <!-- Recent Activities - Only for Admin -->
+                <div class="bg-white rounded-xl shadow-md p-6" id="recentActivitiesSection" style="display: none;">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Aktivitas Terbaru</h2>
                     <div id="recentActivities" class="space-y-3">
                         <!-- Activities will be populated here -->
+                    </div>
+                </div>
+
+                <!-- User Info Section - For Non-Admin -->
+                <div class="bg-white rounded-xl shadow-md p-6" id="userInfoSection">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Informasi Pengguna</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-user text-blue-600 text-2xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Username</p>
+                                    <p class="font-semibold text-gray-800" id="dashboardUsername">-</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-building text-green-600 text-2xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Divisi SDS</p>
+                                    <p class="font-semibold text-gray-800" id="dashboardDivision">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-purple-50 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-purple-600 text-2xl mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-600">Akses</p>
+                                <p class="font-semibold text-gray-800">Anda dapat membuat, melihat, dan mengunduh ebook serta dokumentasi project</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -321,6 +355,7 @@
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Divisi SDS</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Aktivitas</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700">Detail</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="activitiesTable">
@@ -511,6 +546,7 @@
                 
                 if (user.role === 'admin') {
                     document.getElementById('adminMenu').style.display = 'block';
+                    document.getElementById('activitiesMenu').style.display = 'block';
                 }
                 
                 // Show create/upload buttons for all users except admin
@@ -576,7 +612,17 @@
             hideAllContent();
             document.getElementById('dashboardContent').classList.remove('hidden');
             updateDashboardStats();
-            updateRecentActivities();
+            
+            // Show/hide sections based on user role
+            if (currentUser.role === 'admin') {
+                document.getElementById('recentActivitiesSection').style.display = 'block';
+                document.getElementById('userInfoSection').style.display = 'none';
+                updateRecentActivities();
+            } else {
+                document.getElementById('recentActivitiesSection').style.display = 'none';
+                document.getElementById('userInfoSection').style.display = 'block';
+                updateUserInfo();
+            }
         }
 
         function showEbooks() {
@@ -592,6 +638,13 @@
         }
 
         function showActivities() {
+            // Check if user is admin
+            if (currentUser.role !== 'admin') {
+                showNotification('Anda tidak memiliki akses ke halaman ini!', 'error');
+                showDashboard();
+                return;
+            }
+            
             hideAllContent();
             document.getElementById('activitiesContent').classList.remove('hidden');
             displayActivities();
@@ -641,6 +694,11 @@
                 `;
                 container.appendChild(div);
             });
+        }
+
+        function updateUserInfo() {
+            document.getElementById('dashboardUsername').textContent = currentUser.username;
+            document.getElementById('dashboardDivision').textContent = currentUser.division || 'Administrator';
         }
 
         // Ebook Functions
@@ -873,7 +931,7 @@
             const tbody = document.getElementById('activitiesTable');
             tbody.innerHTML = '';
             
-            activities.slice().reverse().forEach(activity => {
+            activities.slice().reverse().forEach((activity, index) => {
                 const tr = document.createElement('tr');
                 tr.className = 'border-b hover:bg-gray-50';
                 tr.innerHTML = `
@@ -886,9 +944,25 @@
                             ${getActivityType(activity.action)}
                         </span>
                     </td>
+                    <td class="py-3 px-4">
+                        <button onclick="deleteActivity(${activities.length - 1 - index})" class="text-red-600 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function deleteActivity(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus aktivitas ini?')) {
+                const activity = activities[index];
+                activities.splice(index, 1);
+                localStorage.setItem('sds_activities', JSON.stringify(activities));
+                addActivity(currentUser.username, currentUser.division, `Menghapus aktivitas: ${activity.action} oleh ${activity.user}`);
+                showNotification('Aktivitas berhasil dihapus!', 'success');
+                displayActivities();
+            }
         }
 
         function addActivity(user, division, action) {
@@ -1025,6 +1099,7 @@
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('loginForm').reset();
             document.getElementById('adminMenu').style.display = 'none';
+            document.getElementById('activitiesMenu').style.display = 'none';
             document.getElementById('createEbookBtn').style.display = 'none';
             document.getElementById('uploadDocBtn').style.display = 'none';
         }
